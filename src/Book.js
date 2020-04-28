@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import * as BooksAPI from './BooksAPI'
 
 class Book extends Component {
     static propTypes = {
@@ -7,9 +8,14 @@ class Book extends Component {
     }
 
     onChangeShelf = (shelf) => {  
-        this.props.onChangeShelf(this.props.book.id, shelf);
+        BooksAPI.update({id: this.props.book.id}, shelf)
+        .then((book) => {
+            this.props.onUpdate();
+        })
+        
     } 
 
+    
     render() {
         const { book } = this.props;
         return (
