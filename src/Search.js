@@ -12,20 +12,44 @@ class Search extends Component {
 
 
     search = (query) => {
+        const idsInShelf = this.props.booksInShelf.map(book => book.id);
 
-        query.length > 0 && BooksAPI.search(query)
+        BooksAPI.search(query)
         .then((books) => {
-          //const inShelf = books.length > 0 && this.props.booksInShelf.filter(book => books.entries().include(book.id));
-          //console.log('In Shelf', inShelf);
-          this.setState(() => ({
-            searchTerm: query,
-            booksSearch: books.filter(book => book.id === "KXcf22HQlGkC")
-          }))
-    
+
+          if (books && books.length > 0) {
+
+            //Get all books from search that aren't in any shelf
+            let booksSearch = books.filter(book => !idsInShelf.includes(book.id))
+
+            const idsInSearch = books.map(book => book.id);
+
+
+            //Get all books from this.props.booksInShelf that are on search
+            let booksInShelf = this.props.booksInShelf.filter(book => idsInSearch.includes(book.id));
+
+
+
+            this.setState(() => ({
+              searchTerm: query,
+              booksSearch: booksSearch.concat(booksInShelf)
+
+            }))
+
+          } else {
+            this.setState(() => ({
+              searchTerm: query,
+              booksSearch: books
+
+            }))
+
+          }
+
+
         })
-    
+
       }
-    
+
 
     render() {
         const { onUpdate } = this.props;
@@ -34,8 +58,8 @@ class Search extends Component {
             <div className="search-books-bar">
                 <Link to="/" >
                     <button className="close-search">Close</button>
-                </Link>                
-              
+                </Link>
+
               <div className="search-books-input-wrapper">
                 {/*
                   NOTES: The search from BooksAPI is limited to a particular set of search terms.
